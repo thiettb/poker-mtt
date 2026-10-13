@@ -1,0 +1,1010 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Sổ Tay Poker MTT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: "đồng hồ giải đấu" — header dính kiểu bảng level, nội dung 1 cột đọc trên điện thoại, công cụ chèn giữa bài */
+:root{
+  --bg:#F2F5F1; --surface:#FFFFFF; --surface-2:#E8EEE9; --ink:#15201B; --muted:#56665E; --line:#D5DED7;
+  --felt:#1E5C49; --felt-soft:#D9EBE2; --on-felt:#FFFFFF;
+  --gold:#94650F; --gold-soft:#F3E6C8; --red:#AE3727; --red-soft:#F5DBD5; --blue:#2B5C8A; --blue-soft:#DCE7F2;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1411; --surface:#141E19; --surface-2:#1B2822; --ink:#E4ECE7; --muted:#93A49B; --line:#26362E;
+  --felt:#5CC39C; --felt-soft:#173429; --on-felt:#0D1411;
+  --gold:#E3B45C; --gold-soft:#32281A; --red:#F08371; --red-soft:#3B1F1A; --blue:#8DB8E3; --blue-soft:#1A2836; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1411; --surface:#141E19; --surface-2:#1B2822; --ink:#E4ECE7; --muted:#93A49B; --line:#26362E;
+  --felt:#5CC39C; --felt-soft:#173429; --on-felt:#0D1411;
+  --gold:#E3B45C; --gold-soft:#32281A; --red:#F08371; --red-soft:#3B1F1A; --blue:#8DB8E3; --blue-soft:#1A2836; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:120px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.6;-webkit-text-size-adjust:100%}
+a{color:var(--felt)}
+:focus-visible{outline:2px solid var(--felt);outline-offset:2px}
+
+/* Header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.top-in{max-width:820px;margin:0 auto;padding:10px 16px 0;display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:22px;letter-spacing:.02em;text-transform:uppercase;line-height:1;flex:1;min-width:0}
+.brand small{display:block;font-family:var(--f-body);font-size:11px;font-weight:500;letter-spacing:.06em;color:var(--muted);margin-top:3px}
+.prog{font-family:var(--f-mono);font-size:12px;color:var(--muted);text-align:right;white-space:nowrap}
+.prog-bar{height:4px;width:84px;background:var(--surface-2);border-radius:4px;overflow:hidden;margin-top:4px;margin-left:auto}
+.prog-bar i{display:block;height:100%;background:var(--felt);width:0;transition:width .3s}
+.nav{max-width:820px;margin:0 auto;display:flex;gap:6px;overflow-x:auto;padding:10px 16px;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:none;text-decoration:none;color:var(--ink);font-size:13px;font-weight:500;padding:6px 11px;border-radius:999px;background:var(--surface);border:1px solid var(--line);white-space:nowrap}
+.nav a.on{background:var(--felt);color:var(--on-felt);border-color:var(--felt)}
+.nav a.done::after{content:" ✓";color:var(--felt)}
+.nav a.on.done::after{color:var(--on-felt)}
+
+main{max-width:820px;margin:0 auto;padding-inline:16px;padding-block:8px 80px}
+
+/* Hero */
+.hero{padding-block:22px 6px}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(34px,9vw,54px);line-height:.98;text-transform:uppercase;margin:.25em 0 .3em;text-wrap:balance}
+.lede{color:var(--muted);max-width:62ch;margin:0}
+.toc{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:18px}
+.toc a{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;font-weight:600;font-size:14px;line-height:1.3}
+.toc a span{font-family:var(--f-mono);font-size:10.5px;font-weight:500;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.toc-group{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:18px 0 0;grid-column:1/-1}
+
+/* Sections */
+section{padding-block:30px 6px;border-top:1px solid var(--line);margin-top:26px}
+.sec-head{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.sec-head .t{flex:1;min-width:0}
+h2{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,7vw,38px);line-height:1.02;text-transform:uppercase;margin:.15em 0 .1em;text-wrap:balance}
+h3{font-family:var(--f-display);font-weight:600;font-size:22px;line-height:1.15;margin:1.3em 0 .3em;letter-spacing:.01em;text-wrap:balance}
+h4{font-size:15px;margin:1.1em 0 .2em}
+p{margin:.5em 0;max-width:68ch}
+ul,ol{padding-left:1.25em;margin:.4em 0;max-width:68ch}
+li{margin:.25em 0}
+li::marker{color:var(--felt)}
+strong{font-weight:600}
+.learn{flex:none;font:600 12.5px var(--f-body);padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;margin-top:6px}
+.learn[aria-pressed="true"]{background:var(--felt);border-color:var(--felt);color:var(--on-felt)}
+.lv{display:inline-block;font-family:var(--f-mono);font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--surface-2);color:var(--muted);letter-spacing:.04em;vertical-align:2px}
+.lv.deep{background:var(--felt-soft);color:var(--felt)}
+.lv.steal{background:var(--gold-soft);color:var(--gold)}
+.lv.rs{background:var(--blue-soft);color:var(--blue)}
+.lv.pf{background:var(--red-soft);color:var(--red)}
+
+/* Callouts */
+.note{border-radius:var(--r);padding:12px 14px;margin:14px 0;background:var(--surface);border:1px solid var(--line)}
+.note b.k{display:block;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.note.key{background:var(--felt-soft);border-color:transparent}
+.note.key b.k{color:var(--felt)}
+.note.warn{background:var(--red-soft);border-color:transparent}
+.note.warn b.k{color:var(--red)}
+.note.gold{background:var(--gold-soft);border-color:transparent}
+.note.gold b.k{color:var(--gold)}
+.note ul{margin:.2em 0}
+.note p{margin:.3em 0}
+
+/* Tables */
+.tw{overflow-x:auto;margin:12px 0;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font-family:var(--f-mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--surface-2);white-space:nowrap}
+td.n,th.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.brk td{background:var(--surface-2);font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:5px 10px}
+tr.reg td{background:var(--red-soft);color:var(--red);font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:5px 10px}
+td .lv{vertical-align:0}
+
+/* Phase blocks */
+.phase{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:18px 0}
+.phase .rail{grid-row:span 2;width:6px;border-radius:6px;background:var(--line)}
+.phase.deep .rail{background:var(--felt)}
+.phase.steal .rail{background:var(--gold)}
+.phase.rs .rail{background:var(--blue)}
+.phase.pf .rail{background:var(--red)}
+.phase h3{margin:0}
+.phase .body{min-width:0}
+.phase .meta{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+
+/* Tools */
+.tool{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin:18px 0}
+.tool-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.tool-h b{font-family:var(--f-display);font-size:21px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+.tool-h span{font-size:12.5px;color:var(--muted)}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--muted)}
+input,select,textarea{font:500 16px var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%;min-width:0}
+textarea{font-family:var(--f-mono);font-size:14px;resize:vertical}
+.out{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.stat{background:var(--surface-2);border-radius:10px;padding:10px 12px;min-width:0}
+.stat small{display:block;font-size:11px;font-family:var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stat b{display:block;font-family:var(--f-display);font-size:28px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.advice{margin-top:12px;padding:12px 14px;border-radius:10px;background:var(--felt-soft)}
+.advice.steal{background:var(--gold-soft)}
+.advice.rs{background:var(--blue-soft)}
+.advice.pf{background:var(--red-soft)}
+.advice b{display:block;font-family:var(--f-display);font-size:19px;text-transform:uppercase;letter-spacing:.02em}
+.advice ul{margin:.3em 0 0}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{font:600 13px var(--f-body);padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--felt);color:var(--on-felt);border-color:var(--felt)}
+.grp-label{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+
+.grid-wrap{overflow-x:auto;margin-top:10px}
+.grid{display:grid;grid-template-columns:repeat(13,minmax(24px,1fr));gap:2px;min-width:330px}
+.cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:clamp(8px,2.3vw,11.5px);font-weight:500;border-radius:3px;background:var(--surface-2);color:var(--muted);max-width:100%;user-select:none}
+.cell.pair{background:var(--gold-soft)}
+.cell.in{background:var(--felt);color:var(--on-felt);font-weight:700}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:10px;align-items:center}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+.range-txt{font-family:var(--f-mono);font-size:12.5px;background:var(--surface-2);border-radius:8px;padding:8px 10px;margin-top:10px;overflow-wrap:anywhere;color:var(--ink)}
+
+/* Quiz */
+.quiz-q{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.cards{display:flex;gap:6px}
+.card{width:52px;height:72px;border-radius:7px;background:#FFFFFF;border:1px solid #C9D1CC;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--f-display);font-weight:700;font-size:28px;line-height:.9;color:#1A1A1A}
+.card.r{color:#C0392B}
+.card.b{color:#1F4FA0}
+.card.g{color:#1F7A3D}
+.card span{font-size:22px}
+.quiz-meta{min-width:0;flex:1}
+.quiz-meta b{font-family:var(--f-display);font-size:22px;text-transform:uppercase;display:block;line-height:1.1}
+.btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{font:700 15px var(--f-body);padding:11px 18px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;flex:1;min-width:110px}
+.btn.pri{background:var(--felt);color:var(--on-felt);border-color:var(--felt)}
+.btn.dng{background:var(--red);color:var(--bg);border-color:var(--red)}
+.fb{margin-top:10px;font-weight:600;min-height:1.5em}
+.fb.ok{color:var(--felt)}
+.fb.no{color:var(--red)}
+
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.two > div{min-width:0}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.box h4{margin-top:0}
+.foot{color:var(--muted);font-size:13px;margin-top:40px;border-top:1px solid var(--line);padding-top:14px}
+.totop{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:18px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand">Sổ Tay MTT<small>Học theo từng level · Flight D 30k</small></div>
+    <div class="prog"><span id="progTxt">0/18 đã học</span><div class="prog-bar"><i id="progBar"></i></div></div>
+  </div>
+  <nav class="nav" id="nav" aria-label="Mục lục"></nav>
+</header>
+
+<main>
+<div class="hero">
+  <div class="eyebrow">Stack 30.000 · Đóng reg cuối L11 (22:35)</div>
+  <h1>Đánh MTT theo từng giai đoạn</h1>
+  <p class="lede">Mở trên điện thoại khi ngồi bàn. Mỗi phần có thể đánh dấu đã học. Nhập stack hiện tại vào máy tính để biết bạn đang ở chế độ nào và nên open size bao nhiêu.</p>
+  <div class="toc" id="toc"></div>
+</div>
+
+<!-- 1 -->
+<section id="cau-truc" data-title="Cấu trúc giải" data-group="Giải hôm nay">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Giải hôm nay</div><h2>Cấu trúc blind &amp; stack</h2></div></div>
+  <p>Giữ nguyên 30k chip, độ sâu stack đi như sau. Pot mỗi tay = SB + BB + BB ante.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Lv</th><th>Blind / Ante</th><th class="n">Pot</th><th class="n">30k =</th><th>Open gợi ý</th></tr></thead>
+    <tbody id="blindBody"></tbody>
+  </table></div>
+
+  <h3>Ba điều rút ra</h3>
+  <ol>
+    <li><strong>Đầu giải rất sâu, sau reg rất nhanh.</strong> Từ 300bb ở L1 xuống 20bb ở L12, và level rút còn 25 phút. Ai không tăng chip từ L1–7 sẽ phải push/fold ngay sau khi đóng reg. Tiền thật nằm ở L1–7.</li>
+    <li><strong>SB bị lệch ở vài level.</strong> Bình thường SB = ½ BB, nhưng ở đây:
+      <ul>
+        <li><span class="lv">L1</span> 100/100: SB đã bỏ bằng BB. Fold về SB thì được xem flop miễn phí, nên không bao giờ fold SB ở L1 khi không ai raise.</li>
+        <li><span class="lv">L3</span> 100/300 và <span class="lv">L14</span> 1K/2.5K: SB chỉ bằng ⅓–0,4 BB. SB chơi chặt hơn (3bet hoặc fold vs open). Ở BTN/CO thì steal mạnh hơn vì SB sẽ fold nhiều.</li>
+        <li><span class="lv">L4</span> 200/300 và <span class="lv">L12</span> 1K/1.5K: SB = ⅔ BB, chỉ cần bỏ thêm ⅓ BB. SB nên complete/limp và defend rộng hơn nhiều vs BB.</li>
+      </ul></li>
+    <li><strong>Người re-entry ở L10–11</strong> vào với 21–25bb và shove rất nhiều. Hãy thuộc sẵn range call shove ở phần <a href="#tra-nhanh">Tra nhanh</a>.</li>
+  </ol>
+
+  <div class="tool" id="calc">
+    <div class="tool-h"><b>Máy tính stack</b><span>Nhập stack mỗi lần đổi level</span></div>
+    <div class="fields">
+      <label for="cStack">Stack của bạn<input id="cStack" type="number" inputmode="numeric" value="30000" min="0" step="500"></label>
+      <label for="cLevel">Level hiện tại<select id="cLevel"></select></label>
+      <label for="cAvg">Average stack (tùy chọn)<input id="cAvg" type="number" inputmode="numeric" placeholder="xem trên đồng hồ" min="0" step="1000"></label>
+    </div>
+    <div class="out">
+      <div class="stat"><small>Big blind</small><b id="oBB">300</b></div>
+      <div class="stat"><small>M (stack/pot)</small><b id="oM">100</b></div>
+      <div class="stat"><small>Open size</small><b id="oOpen">300</b></div>
+      <div class="stat"><small>So với avg</small><b id="oAvg">–</b></div>
+    </div>
+    <div class="advice" id="oAdv"></div>
+  </div>
+
+  <h3>Lịch trình Flight D (16:30)</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Giờ</th><th>Level</th><th>Việc chính</th></tr></thead>
+    <tbody>
+      <tr><td class="n">16:30–18:30</td><td><span class="lv deep">L1–4</span></td><td>Kiên nhẫn, vị trí, set-mine, value bet</td></tr>
+      <tr><td class="n">18:40–20:10</td><td><span class="lv steal">L5–7</span></td><td>Steal và 3bet, tích chip</td></tr>
+      <tr><td class="n">20:20–22:35</td><td><span class="lv rs">L8–11</span></td><td>Chuyển sang reshove, đánh vào stack trung bình</td></tr>
+      <tr><td class="n">Sau 22:50</td><td><span class="lv pf">L12+</span></td><td>Push/fold</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note gold"><b class="k">Hỏi floor trước khi ngồi</b>
+    <ul>
+      <li>Day 1 dừng ở level nào, hay khi còn bao nhiêu % field?</li>
+      <li>Bag (qua Day 2) có được tính ITM không?</li>
+    </ul>
+    <p>Câu trả lời quyết định bạn được đánh chip-EV thoải mái hay phải tính ICM ở cuối đêm. Mỗi break, xem average stack trên màn hình đồng hồ: dưới 0,7× average thì cần chủ động hơn, trên 1,5× average thì đè các stack trung bình.</p>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="giai-doan" data-title="Theo level" data-group="Giải hôm nay">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Lộ trình</div><h2>Chiến lược theo từng khối level</h2></div></div>
+
+  <div class="phase deep"><div class="rail"></div><div class="body">
+    <div class="meta">Khối 1 · L1–2 · 300 → 150bb</div>
+    <h3>Pot nhỏ, tiền nằm ở postflop</h3>
+    <p>Pot rất nhỏ so với stack, nên không cần tranh blind. Tiền nằm ở postflop vs người chơi yếu.</p>
+    <ul>
+      <li><strong>Chơi:</strong> đôi 22+ (set-mine mọi vị trí, trừ UTG với 22–44 nếu bàn hay 3bet), suited connectors 54s+, suited Ax, suited broadway. Ưu tiên có vị trí.</li>
+      <li><strong>Bỏ ở vị trí sớm:</strong> KJo, QJo, ATo, KTo. Đây là bài chết stack ở 150bb+.</li>
+      <li><strong>3bet:</strong> vs rec thì value thuần (QQ+, AK; thêm JJ, AQs vs người open rộng), size lớn (IP 4x, OOP 5x). Gần như không 3bet bluff.</li>
+      <li><strong>Call 3bet:</strong> ở 150bb+, call IP với mọi đôi 22–JJ, suited connectors, AQs, KQs. Implied odds rất lớn. 4bet chỉ với KK+ (QQ/AK call IP vs nit).</li>
+      <li><strong>Postflop:</strong> value bet 3 street với top pair kicker tốt vs calling station. Không stack off one pair. Ở 300bb, kể cả overpair cũng chỉ nên chơi pot vừa.</li>
+      <li><strong>Multiway:</strong> pot limp nhiều người là bình thường. Overlimp đôi nhỏ / suited connectors ở vị trí muộn. Iso raise 4bb + 1bb mỗi limper với bài mạnh.</li>
+    </ul>
+  </div></div>
+
+  <div class="phase deep"><div class="rail"></div><div class="body">
+    <div class="meta">Khối 2 · L3–4 · 100bb</div>
+    <h3>Tận dụng SB lệch</h3>
+    <ul>
+      <li><span class="lv">L3</span> SB rất rẻ (100), nên steal từ CO/BTN rộng hơn (BTN khoảng 45%). Khi bạn ở SB vs open thì 3bet hoặc fold, hạn chế flat.</li>
+      <li><span class="lv">L4</span> SB = 200/300. Fold về SB thì limp/complete rất rộng (khoảng 70% bài). BB vs SB limp: raise lên khoảng 1.200 với bài mạnh và bluff Kx/Qx suited, check bài trung bình.</li>
+      <li>Bắt đầu 3bet bluff vs reg open muộn: A5s–A2s, K9s, QTs, 76s.</li>
+      <li>Call 3bet IP: 55–JJ, AQs, AJs, KQs, JTs. OOP: chỉ TT–JJ, AQs, KQs.</li>
+    </ul>
+    <div class="note"><b class="k">Checkpoint break 1 (sau L4)</b>Mục tiêu 40k+. Có 25–30k cũng không sao, vẫn còn 75bb.</div>
+  </div></div>
+
+  <div class="phase steal"><div class="rail"></div><div class="body">
+    <div class="meta">Khối 3 · L5–7 · 75 → 50bb</div>
+    <h3>Giai đoạn kiếm chip chính</h3>
+    <ul>
+      <li><strong>Steal mạnh:</strong> CO khoảng 30%, BTN 45–50%, SB vs BB 50%+ (raise 2,5–3x).</li>
+      <li><strong>3bet vs open CO/BTN:</strong> value JJ+, AQs+, AK (thêm TT, AQo vs BTN); bluff A2s–A5s, KTs, QJs, suited connectors. Size IP 3x, OOP 3,5–4x.</li>
+      <li><strong>Call 3bet:</strong> L5 còn call IP với 66–TT. Đến L7 (50bb) thì bỏ 22–55 vs 3bet, không còn implied odds.</li>
+      <li><strong>4bet:</strong> QQ+, AK. Ở L7 vs 3bet nhẹ từ blind, 4bet shove được JJ, AQs.</li>
+    </ul>
+    <div class="note"><b class="k">Checkpoint break 2 (sau L7)</b>Mục tiêu ≥ 50k (≥ 80bb). Nếu chỉ 30k (50bb), bạn cần chủ động tìm spot ở L8–9 trước khi xuống 25bb.</div>
+  </div></div>
+
+  <div class="phase rs"><div class="rail"></div><div class="body">
+    <div class="meta">Khối 4 · L8–11 · 37 → 21bb · đóng reg</div>
+    <h3>Reshove thay cho 3bet nhỏ</h3>
+    <ul>
+      <li>Open giảm còn 2–2,1x.</li>
+      <li>Từ L9 (30bb trở xuống) dùng 3bet shove thay vì 3bet nhỏ. Bảng range ở phần <a href="#tra-nhanh">Tra nhanh</a> (mục “3bet shove 20–30bb”).</li>
+      <li><strong>Call 3bet:</strong> nếu size 3bet ≥ ⅓ stack của bạn thì shove hoặc fold, không call.</li>
+      <li>Người mới re-entry ở L10–11 (21–25bb) shove rất rộng. Vs shove của họ từ vị trí muộn, call với 88+, ATs+, AJo+, KQs.</li>
+    </ul>
+    <div class="tw"><table>
+      <thead><tr><th>Người open từ</th><th>Bạn 3bet shove (20–30bb)</th></tr></thead>
+      <tbody>
+        <tr><td>UTG / UTG+1</td><td>TT+, AQ+</td></tr>
+        <tr><td>MP</td><td>88+, AJs+, AQo+, KQs</td></tr>
+        <tr><td>CO</td><td>66+, A9s+, ATo+, KJs+, KQo</td></tr>
+        <tr><td>BTN / SB</td><td>22+, A2s+, A8o+, K9s+, KJo+, QTs+, JTs</td></tr>
+      </tbody>
+    </table></div>
+  </div></div>
+
+  <div class="phase pf"><div class="rail"></div><div class="body">
+    <div class="meta">Khối 5 · L12+ · ≤ 20bb</div>
+    <h3>Push/fold</h3>
+    <p>Dùng bảng open-shove và call-shove ở phần <a href="#tra-nhanh">Tra nhanh</a>. Ở L12 (SB 1K/1.5K) khi bạn ở SB thì shove rộng hơn nữa, hoặc limp bài mạnh để bẫy.</p>
+    <p>Range là xấp xỉ theo chip-EV. Khi gần bubble hoặc gần tiền thì chặt lại khoảng 20–30%, trừ khi bạn là big stack.</p>
+  </div></div>
+</section>
+
+<!-- 3 -->
+<section id="vi-tri" data-title="Vị trí" data-group="Preflop">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Preflop</div><h2>Từng vị trí trên bàn</h2></div></div>
+  <p>Càng gần BTN, càng ít người phía sau có thể có bài mạnh, và bạn càng được hành động sau ở postflop. Range open mở rộng dần từ UTG đến BTN. Phần trăm dưới đây là bàn 8–9 người, có BB ante, stack 40bb trở lên.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Vị trí</th><th class="n">Open</th><th>Vai trò &amp; cách chơi</th></tr></thead>
+    <tbody>
+      <tr><td><strong>UTG</strong></td><td class="n">~15%</td><td>Còn 8 người phía sau. Range chặt, ưu tiên bài chơi tốt khi OOP. Không open KJo, QJo, ATo. Vs 3bet: 4bet QQ+/AK, call JJ–TT, AQs IP.</td></tr>
+      <tr><td><strong>UTG+1</strong></td><td class="n">~17%</td><td>Gần như UTG, thêm 55, A7s, K9s, ATo. Bàn chặt thì nới thêm một chút.</td></tr>
+      <tr><td><strong>MP / LJ</strong></td><td class="n">~20%</td><td>Thêm suited connectors 98s, T9s, KJo. Vẫn là range “thật”, ít bị 3bet nhẹ.</td></tr>
+      <tr><td><strong>HJ</strong></td><td class="n">~24%</td><td>Bắt đầu open mọi đôi, mọi Axs. Nhìn CO và BTN: nếu họ hay 3bet thì bỏ đáy range.</td></tr>
+      <tr><td><strong>CO</strong></td><td class="n">~30%</td><td>Vị trí steal thứ hai. BTN chặt hoặc ngắn thì open rộng hơn. Thêm A8o+, KTo+, QTo, JTo.</td></tr>
+      <tr><td><strong>BTN</strong></td><td class="n">45–50%</td><td>Vị trí tốt nhất: luôn có vị trí postflop. Steal rộng nhất, flat 3bet và call open nhiều hơn mọi vị trí khác. Chú ý stack của SB/BB: blind ngắn 10–20bb sẽ reshove, nên bỏ bài rác.</td></tr>
+      <tr><td><strong>SB</strong></td><td class="n">~45% vs BB</td><td>Luôn OOP postflop. Vs open: chủ yếu 3bet hoặc fold, ít flat. Fold về SB: raise 2,5–3x, hoặc limp rộng ở level SB lệch (L4, L12). Ở L1 không bao giờ fold khi chưa ai raise.</td></tr>
+      <tr><td><strong>BB</strong></td><td class="n">defend</td><td>Đã bỏ BB + ante nên giá call rất tốt. Vs BTN min-raise defend khoảng 60–65%; vs CO khoảng 45%; vs UTG khoảng 25–30%. 3bet bài mạnh và vài bluff có blocker (A5s, K9s).</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note key"><b class="k">Giá ở BB (có BB ante)</b>
+    <p>BTN open 2,2bb. Pot = 0,5 + 1 + 1 (ante) + 2,2 = 4,7bb. Bạn chỉ cần bỏ thêm 1,2bb để thắng 5,9bb, tức cần khoảng 20% equity. Gần như mọi bài suited và mọi bài có lá ≥ T đều đủ equity để call.</p>
+  </div>
+  <p>Xem range open từng vị trí bằng bảng 13×13 ở phần <a href="#tra-nhanh">Tra nhanh</a> (nhóm “Open raise 40bb+”).</p>
+</section>
+
+<!-- 4 -->
+<section id="preflop" data-title="Preflop" data-group="Preflop">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Preflop</div><h2>Cách đánh preflop</h2></div></div>
+
+  <h3>Open (khi chưa ai vào pot)</h3>
+  <ul>
+    <li>Luôn open-raise, không open-limp. Ngoại lệ duy nhất là SB vs BB ở level SB lệch hoặc khi bạn có kế hoạch limp-raise.</li>
+    <li>Open cùng một size cho mọi bài trong cùng vị trí, để đối thủ không đọc được.</li>
+    <li>Chỉnh theo bàn: người phía sau hay 3bet thì chặt lại; blinds hay fold thì mở rộng.</li>
+  </ul>
+
+  <h3>Khi có người limp</h3>
+  <ul>
+    <li><strong>Iso raise</strong> với bài mạnh và bài broadway: 4bb + 1bb mỗi limper khi sâu (100bb+), 3bb + 1bb khi 40–60bb.</li>
+    <li><strong>Overlimp</strong> đôi nhỏ, suited connectors, Axs nhỏ ở vị trí muộn khi stack sâu.</li>
+    <li>Rec limp rồi call iso là nguồn chip lớn nhất ở L1–4. Họ fold flop quá nhiều hoặc call xuống với bài yếu, cả hai đều có lợi cho bạn.</li>
+  </ul>
+
+  <h3>3bet</h3>
+  <div class="two">
+    <div class="box"><h4>Vs open sớm (UTG–MP): 3bet linear, chặt</h4><p>QQ+, AK, thêm JJ, AQs vs người open rộng. Gần như không bluff. Flat JJ–99, AQs, KQs khi có vị trí.</p></div>
+    <div class="box"><h4>Vs open muộn (CO–BTN–SB): 3bet polar</h4><p>Value JJ+, AQs+, AK (thêm TT, AQo vs BTN). Bluff có blocker: A5s–A2s, KTs, QJs, suited connectors.</p></div>
+  </div>
+  <p><strong>Size 3bet:</strong> IP 3x open, OOP 3,5–4x open. Deep (150bb+) vs rec: IP 4x, OOP 5x.</p>
+
+  <h3>Vs 3bet</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Stack</th><th>Call</th><th>4bet</th></tr></thead>
+    <tbody>
+      <tr><td class="n">150bb+</td><td>IP: 22–JJ, suited connectors, AQs, KQs</td><td>KK+ (QQ/AK call IP vs nit)</td></tr>
+      <tr><td class="n">100bb</td><td>IP: 55–JJ, AQs, AJs, KQs, JTs. OOP: TT–JJ, AQs, KQs</td><td>QQ+, AK + vài bluff A5s</td></tr>
+      <tr><td class="n">50–75bb</td><td>IP: 66–TT (L5). Bỏ 22–55 khi xuống 50bb</td><td>QQ+, AK. Vs 3bet nhẹ từ blind: shove JJ, AQs</td></tr>
+      <tr><td class="n">≤ 40bb</td><td>Không call nếu 3bet ≥ ⅓ stack</td><td>4bet = shove</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Squeeze</h3>
+  <p>Có người open và có người call: 3bet lớn hơn bình thường (khoảng 4x open + 1x mỗi người call). Squeeze tốt nhất khi người open ở vị trí muộn (range rộng) và người call là rec (range bị giới hạn, khó 4bet). Bài squeeze: value QQ+, AK; bluff Axs, KQo, suited broadway.</p>
+
+  <div class="note warn"><b class="k">Lỗi preflop hay gặp</b>
+    <ul>
+      <li>Call open OOP với KJo, QTo, A9o. Bài dominated, không có vị trí.</li>
+      <li>Open rồi fold vs shove khi stack ≤ 15bb. Ở độ sâu này nên shove thẳng hoặc fold.</li>
+      <li>Flat 3bet với đôi nhỏ khi stack ≤ 50bb. Không còn implied odds để set-mine.</li>
+      <li>Limp-call ở vị trí sớm. Mất vị trí, mất fold equity.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="sizing" data-title="Sizing" data-group="Preflop">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Preflop &amp; postflop</div><h2>Sizing</h2></div></div>
+  <h3>Preflop</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Tình huống</th><th>Size</th></tr></thead>
+    <tbody>
+      <tr><td>Open 100bb+</td><td>2,5–3x (L1–4 theo bảng blind)</td></tr>
+      <tr><td>Open 40–75bb</td><td>2,2–2,5x</td></tr>
+      <tr><td>Open 20–40bb</td><td>2–2,1x</td></tr>
+      <tr><td>Open dưới 15bb</td><td>Shove, hoặc min-raise bài rất mạnh</td></tr>
+      <tr><td>SB vs BB</td><td>3x (vì OOP), hoặc limp</td></tr>
+      <tr><td>Iso vs limper</td><td>4bb + 1bb/limper khi sâu; 3bb + 1bb khi 40–60bb</td></tr>
+      <tr><td>3bet</td><td>IP 3x, OOP 3,5–4x; deep vs rec 4x / 5x</td></tr>
+      <tr><td>Squeeze</td><td>4x open + 1x mỗi người call</td></tr>
+      <tr><td>4bet</td><td>2,2x 3bet (IP) – 2,5x (OOP); ≤ 40bb thì shove</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Postflop</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Tình huống</th><th>Size (% pot)</th></tr></thead>
+    <tbody>
+      <tr><td>C-bet board khô, bạn có lợi thế range (A72r, K83r)</td><td class="n">25–33%</td></tr>
+      <tr><td>C-bet board ướt, nhiều draw (JT8, 976 hai chất)</td><td class="n">50–75%</td></tr>
+      <tr><td>Board đôi, monotone</td><td class="n">25–33%</td></tr>
+      <tr><td>Multiway</td><td class="n">50–66%, bet ít lần hơn</td></tr>
+      <tr><td>Turn barrel</td><td class="n">66–75%</td></tr>
+      <tr><td>Turn/River overbet khi bạn có nut advantage</td><td class="n">125–150%</td></tr>
+      <tr><td>River value bài nuts / bluff (polar)</td><td class="n">75–100%+</td></tr>
+      <tr><td>River thin value</td><td class="n">33–50%</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Giá và tần suất (thuộc lòng)</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Bet</th><th class="n">Bạn cần equity để call</th><th class="n">Phải defend (MDF)</th><th class="n">Tỉ lệ bluff tối đa</th></tr></thead>
+    <tbody>
+      <tr><td>⅓ pot</td><td class="n">20%</td><td class="n">75%</td><td class="n">20%</td></tr>
+      <tr><td>½ pot</td><td class="n">25%</td><td class="n">67%</td><td class="n">25%</td></tr>
+      <tr><td>⅔ pot</td><td class="n">29%</td><td class="n">60%</td><td class="n">29%</td></tr>
+      <tr><td>¾ pot</td><td class="n">30%</td><td class="n">57%</td><td class="n">30%</td></tr>
+      <tr><td>1 pot</td><td class="n">33%</td><td class="n">50%</td><td class="n">33%</td></tr>
+      <tr><td>2 pot</td><td class="n">40%</td><td class="n">33%</td><td class="n">40%</td></tr>
+    </tbody>
+  </table></div>
+  <p>Công thức: equity cần = bet ÷ (pot + 2 × bet). MDF = pot ÷ (pot + bet).</p>
+
+  <h3>SPR: khi nào được stack off</h3>
+  <p>SPR = stack hiệu dụng ÷ pot trên flop. SPR quyết định bài nào đủ mạnh để đánh hết stack.</p>
+  <div class="tw"><table>
+    <thead><tr><th class="n">SPR</th><th>Thường gặp</th><th>Stack off với</th></tr></thead>
+    <tbody>
+      <tr><td class="n">&lt; 2</td><td>Pot 3bet khi 20–30bb</td><td>Top pair, overpair, draw mạnh</td></tr>
+      <tr><td class="n">2–6</td><td>Pot 3bet 50–100bb, pot đơn 25–40bb</td><td>Top pair kicker tốt, overpair</td></tr>
+      <tr><td class="n">&gt; 6</td><td>Pot đơn 100bb+ (L1–4)</td><td>Two pair, set trở lên. One pair chơi pot vừa</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 6 -->
+<section id="flop" data-title="Flop" data-group="Postflop">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Postflop</div><h2>Flop</h2></div></div>
+  <p>Trước khi bet, tự hỏi: board này hợp với range của ai hơn? Người raise preflop có nhiều AA, KK, AK, AQ. Người call BB có nhiều bài nhỏ, suited connectors, đôi nhỏ.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Loại board</th><th>Ai lợi</th><th>Cách c-bet</th></tr></thead>
+    <tbody>
+      <tr><td>A-high, K-high khô (A72r, K94r)</td><td>Người raise</td><td>Bet nhỏ 25–33%, tần suất cao, gần như cả range</td></tr>
+      <tr><td>Board đôi (TT4, 772)</td><td>Người raise</td><td>Bet nhỏ, tần suất cao</td></tr>
+      <tr><td>Broadway nối (KQT, QJ9)</td><td>Gần cân bằng</td><td>Bet 50–66% với bài mạnh + draw, check bài trung bình</td></tr>
+      <tr><td>Thấp nối (765, 864 hai chất)</td><td>Người call BB</td><td>Check nhiều; khi bet thì size lớn 66–75% (polar)</td></tr>
+      <tr><td>Monotone</td><td>Ai có lá chất cao</td><td>Bet nhỏ, ít lần; ưu tiên khi có lá chất A/K</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Vị trí và số người</h3>
+  <ul>
+    <li><strong>IP</strong> (bạn hành động sau): c-bet thoải mái hơn, check back bài trung bình để kiểm soát pot.</li>
+    <li><strong>OOP</strong> (ví dụ bạn 3bet từ blind): c-bet ít hơn, check nhiều hơn với bài trung bình, check-raise bài mạnh và draw mạnh.</li>
+    <li><strong>Multiway</strong> (3 người trở lên): c-bet ít hơn hẳn. Bet khi có bài thật hoặc draw mạnh, size 50%+. Bluff multiway hiếm khi hiệu quả.</li>
+  </ul>
+
+  <h3>Khi đối thủ c-bet vào bạn</h3>
+  <ul>
+    <li>Vs c-bet nhỏ (⅓ pot) phải defend rộng: mọi pair, gutshot, backdoor draw có overcard.</li>
+    <li>Check-raise với bài mạnh (two pair+, set) và draw mạnh (flush draw có overcard, open-ended + gutshot). Ở board ướt, check-raise lớn để tính phí draw.</li>
+    <li>Float IP với bài có backdoor, có kế hoạch bet turn khi đối thủ check.</li>
+  </ul>
+
+  <div class="note key"><b class="k">Đối thủ live phổ biến</b>
+    <p>Rec ít khi bluff check-raise. Một check-raise từ rec ở flop thường là two pair+ hoặc draw rất mạnh. Fold top pair kicker yếu không có gì sai.</p>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="turn" data-title="Turn" data-group="Postflop">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Postflop</div><h2>Turn</h2></div></div>
+  <p>Turn là nơi pot bắt đầu lớn thật. Bet turn là bước tiến tới all-in, nên chọn bài kỹ hơn flop.</p>
+  <h3>Barrel tiếp (bet lần 2) khi</h3>
+  <ul>
+    <li>Lá turn là overcard có lợi cho range của bạn: A hoặc K trên board thấp.</li>
+    <li>Bạn có bài value: top pair kicker tốt trở lên.</li>
+    <li>Bạn có equity: draw, hoặc backdoor vừa thành draw ở turn.</li>
+    <li>Lá turn hoàn thành draw mà range bạn có nhiều hơn đối thủ.</li>
+  </ul>
+  <h3>Bỏ cuộc (check) khi</h3>
+  <ul>
+    <li>Bạn có air không equity và lá turn là lá “trắng” với cả hai.</li>
+    <li>Lá turn hoàn thành draw cho range người call (ví dụ lá 9 trên board 876).</li>
+    <li>Bài trung bình (second pair, top pair yếu) ở IP: check back để kiểm soát pot và bắt bluff ở river.</li>
+  </ul>
+  <h3>Các line khác</h3>
+  <ul>
+    <li><strong>Delayed c-bet:</strong> bạn check back flop ở IP, đối thủ check turn tiếp. Bet turn khoảng 50–66%, vì họ đã cho thấy yếu hai lần.</li>
+    <li><strong>Probe bet:</strong> bạn OOP, người raise check back flop. Bet turn khoảng 50–66%, vì range họ không có nhiều bài mạnh.</li>
+    <li><strong>Overbet turn:</strong> khi bạn có nhiều bài nuts hơn đối thủ, ví dụ board A-K-x-x và bạn là người 3bet.</li>
+  </ul>
+  <div class="note warn"><b class="k">Nhớ</b>Turn là nơi người chơi live ít bluff nhất. Vs rec, bet + raise ở turn gần như luôn là bài mạnh.</div>
+</section>
+
+<!-- 8 -->
+<section id="river" data-title="River" data-group="Postflop">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Postflop</div><h2>River</h2></div></div>
+  <p>Ở river không còn draw. Bài của bạn chỉ còn một trong ba nhóm: bài mạnh để value, bài trung bình để check, bài thua để bluff hoặc bỏ.</p>
+  <h3>Bet polar</h3>
+  <ul>
+    <li>Bet lớn (75%–pot+) với bài rất mạnh và với bluff. Check bài trung bình.</li>
+    <li>Tỉ lệ bluff: bet pot thì tối đa khoảng 1 bluff cho 2 value (33%). Bet ½ pot thì 1 bluff cho 3 value (25%).</li>
+  </ul>
+  <h3>Chọn bài bluff</h3>
+  <ul>
+    <li>Draw hụt không có showdown value.</li>
+    <li>Bài <strong>block</strong> bài call của đối thủ. Ví dụ có A♠ khi board có 3 lá bích, đối thủ khó có nut flush.</li>
+    <li>Bài <strong>không block</strong> bài fold của đối thủ. Đừng bluff bằng bài chứa chính draw hụt mà bạn muốn đối thủ đang cầm.</li>
+    <li>Câu chuyện phải hợp lý: line bạn đánh từ preflop phải đại diện được bài mạnh.</li>
+  </ul>
+  <h3>Bắt bluff</h3>
+  <ul>
+    <li>Dùng bảng giá ở phần <a href="#sizing">Sizing</a>: bet ½ pot bạn chỉ cần đúng 25% số lần.</li>
+    <li>Ưu tiên bài block value của đối thủ và không block bluff của họ.</li>
+    <li>Vs rec ở stake thấp: họ bluff river lớn ít hơn lý thuyết rất nhiều. Fold bài trung bình vs bet lớn, đặc biệt trong pot multiway và vs raise ở river.</li>
+  </ul>
+</section>
+
+<!-- 9 -->
+<section id="value" data-title="Value bet" data-group="Postflop">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Postflop</div><h2>Cách value bet</h2></div></div>
+  <div class="note key"><b class="k">Ba câu hỏi trước mỗi lần bet value</b>
+    <ol>
+      <li>Những bài nào kém hơn mình sẽ call?</li>
+      <li>Những bài nào tốt hơn mình đang có?</li>
+      <li>Size lớn nhất mà bài kém nhất trong nhóm 1 vẫn call là bao nhiêu?</li>
+    </ol>
+  </div>
+  <h3>Theo loại đối thủ</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Đối thủ</th><th>Value</th><th>Bluff</th></tr></thead>
+    <tbody>
+      <tr><td>Calling station (call nhiều)</td><td>Bet 3 street, size lớn 66–100%, value mỏng cả top pair kicker trung bình</td><td>Gần như không</td></tr>
+      <tr><td>Nit (chặt)</td><td>Size nhỏ 33–50%, ít street hơn</td><td>Nhiều hơn, nhất là board đáng sợ</td></tr>
+      <tr><td>Reg cân bằng</td><td>Theo bảng sizing</td><td>Theo tỉ lệ ở phần River</td></tr>
+      <tr><td>Rec hiếu chiến</td><td>Check để họ bluff, call / check-raise</td><td>Ít</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Nguyên tắc</h3>
+  <ul>
+    <li><strong>Board ướt:</strong> bet lớn ngay, đừng slowplay. Draw sẽ trả tiền ngay bây giờ hoặc thoát miễn phí.</li>
+    <li><strong>Board khô:</strong> bet nhỏ để giữ bài yếu hơn trong pot.</li>
+    <li><strong>Thin value ở river IP:</strong> top pair kicker yếu, second pair kicker tốt vs station, size ⅓–½.</li>
+    <li><strong>Check-raise value</strong> OOP ở board ướt với set, two pair.</li>
+    <li>Không slowplay trong pot multiway. Càng nhiều người càng có người trả tiền.</li>
+    <li>Ở L1–2 (300bb), value không có nghĩa là stack off. Ba street value với top pair vs station là đủ.</li>
+  </ul>
+</section>
+
+<!-- 10 -->
+<section id="build-chip" data-title="Build chip" data-group="Theo stack">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Theo stack</div><h2>Cách build chip</h2></div></div>
+  <p>Chip đến từ hai nguồn: thắng pot lớn vs người chơi yếu khi stack sâu (L1–4), và lấy blind + ante liên tục khi ante đã lớn (L5–11).</p>
+  <div class="note gold"><b class="k">Ante làm steal đáng giá</b>
+    <p>Ở L8, pot mỗi tay là 2.000. Steal thành công 2 lần mỗi vòng là +4.000, tức +13% stack 30k mà không cần xem flop. Không steal thì mỗi vòng bạn mất 1.200 (SB + BB + ante), khoảng 4% stack.</p>
+  </div>
+  <ul>
+    <li><strong>Chọn mục tiêu:</strong> người ngồi blind fold quá nhiều; stack trung bình sợ bust gần bubble; người limp rồi fold flop.</li>
+    <li><strong>Iso rec ở L1–4:</strong> raise khi rec limp, đánh postflop có vị trí, value bet nặng.</li>
+    <li><strong>3bet nhẹ vs người open muộn</strong> ở L4–7 (A5s–A2s, K9s, QTs, 76s).</li>
+    <li><strong>C-bet nhỏ</strong> ở board có lợi cho range, lấy nhiều pot nhỏ.</li>
+    <li><strong>Tránh coin flip lớn</strong> ở L1–7 khi bạn có lợi thế kỹ năng. Nhận edge nhỏ nhưng có fold equity.</li>
+    <li><strong>Hình ảnh:</strong> sau khi bị bắt bluff, bàn sẽ call bạn nhiều hơn; hãy value bet nặng hơn. Sau một thời gian chặt, steal sẽ dễ thành công hơn.</li>
+    <li><strong>Mỗi break:</strong> so stack với average. Dưới 0,7× thì tăng tần suất steal và reshove; trên 1,5× thì đè stack trung bình.</li>
+  </ul>
+</section>
+
+<!-- 11 -->
+<section id="short" data-title="Short stack" data-group="Theo stack">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Theo stack</div><h2>Khi short chip</h2></div></div>
+  <div class="tw"><table>
+    <thead><tr><th class="n">Stack</th><th>Chế độ</th><th>Cách chơi</th></tr></thead>
+    <tbody>
+      <tr><td class="n">20–30bb</td><td><span class="lv rs">Reshove</span></td><td>Open 2–2,1x. Vs open muộn: 3bet shove thay 3bet nhỏ. Vs 3bet: shove hoặc fold.</td></tr>
+      <tr><td class="n">12–20bb</td><td><span class="lv pf">Shove</span></td><td>Open-shove từ vị trí muộn; min-raise bài rất mạnh (AA–JJ, AK) để dụ shove. Reshove vs open muộn với range rộng.</td></tr>
+      <tr><td class="n">8–12bb</td><td><span class="lv pf">Push/fold</span></td><td>Chỉ shove hoặc fold. Dùng bảng open-shove.</td></tr>
+      <tr><td class="n">&lt; 8bb</td><td><span class="lv pf">Rất rộng</span></td><td>Shove rộng hơn bảng. Dưới 5bb ở BTN/SB vs BB chặt: gần như mọi hai lá.</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Nguyên tắc</h3>
+  <ul>
+    <li><strong>Hành động trước khi tới BB.</strong> Với BB ante, mỗi lần ngồi BB bạn mất 2bb. Có bài tạm ổn ở CO/BTN thì shove trước khi blind ăn stack.</li>
+    <li><strong>Không open-fold</strong> khi ≤ 15bb và không limp-fold. Đó là chip mất trắng.</li>
+    <li><strong>Fold equity là vũ khí.</strong> Shove khi người phía sau còn ít và họ chặt. Tránh shove vào người call rộng và vào big stack call rẻ.</li>
+    <li><strong>Đi trước, đừng chờ bài.</strong> 10bb shove có fold equity; 4bb shove thì gần như luôn bị call.</li>
+    <li><strong>Gần bubble:</strong> nếu còn stack ngắn hơn bạn ở bàn khác, có thể fold vào tiền. Nếu bạn là ngắn nhất, vẫn shove khi có fold equity, vì các stack trung bình sẽ fold nhiều.</li>
+  </ul>
+</section>
+
+<!-- 12 -->
+<section id="chip-leader" data-title="Chip leader" data-group="Theo stack">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Theo stack</div><h2>Khi là chip leader</h2></div></div>
+  <p>Big stack có thể bust người khác còn người khác chỉ làm big stack hao hụt. Đó là áp lực bạn dùng được, nhưng mức áp lực thay đổi theo giai đoạn.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Giai đoạn</th><th>Cách chơi</th></tr></thead>
+    <tbody>
+      <tr><td><span class="lv deep">L1–7</span> sâu</td><td>Chip leader chưa quan trọng nhiều. Chơi postflop vs người yếu. Tránh flip với big stack khác, đó là người duy nhất làm bạn mất vị thế.</td></tr>
+      <tr><td><span class="lv rs">L8–11</span> đóng reg</td><td>Đè stack 35–60bb: họ quá sâu để reshove thoải mái nhưng quá ngắn để call 3bet. Open rộng hơn khi người phía sau là stack trung bình. Vs short 15–25bb, call shove rộng hơn vì bạn cover.</td></tr>
+      <tr><td><span class="lv pf">Bubble</span></td><td>Giai đoạn kiếm chip mạnh nhất. Open và 3bet rất rộng vs stack trung bình. Hạn chế đụng độ stack lớn thứ 2.</td></tr>
+      <tr><td>ITM, 2 bàn</td><td>Mỗi bậc giải thưởng làm stack trung bình chặt lại. Tiếp tục steal, nhưng call shove chặt hơn chút vì giờ bạn có nhiều tiền để mất.</td></tr>
+      <tr><td>Bàn cuối</td><td>Áp lực lên stack 2–5, để các short tự bust nhau. Không đánh hết stack với stack lớn thứ hai trong spot mỏng.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b class="k">Lỗi của chip leader</b>
+    <ul>
+      <li>Call shove quá rộng chỉ vì “có chip”. Mỗi lần thua flip, bạn chuyển chip cho đối thủ.</li>
+      <li>Đụng stack lớn thứ hai trong pot không cần thiết.</li>
+      <li>Ngừng chơi sau khi lên đỉnh. Big stack thụ động sẽ mất vị thế qua blind.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 13 -->
+<section id="dong-reg" data-title="Đóng reg" data-group="Giai đoạn giải">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Giai đoạn giải</div><h2>Khi đóng reg (đóng buy-in)</h2></div></div>
+  <p>Flight D đóng đăng ký ở cuối <span class="lv rs">L11</span> (22:35). Thời điểm này thay đổi cách bạn đánh giá rủi ro.</p>
+  <div class="two">
+    <div class="box"><h4>Trước khi đóng reg</h4>
+      <p>Nếu bạn sẵn sàng re-entry và còn ngân sách, chip-EV là thước đo đúng. Nhận các spot +EV mỏng như flip có fold equity. Bust thì vẫn vào lại được.</p></div>
+    <div class="box"><h4>Sau khi đóng reg</h4>
+      <p>Bust là hết giải. Bỏ các spot +EV mỏng nhất, nhất là khi phải call all-in. Ưu tiên spot bạn là người shove (có fold equity) hơn spot bạn phải call.</p></div>
+  </div>
+  <h3>Hiện tượng ở L10–12</h3>
+  <ul>
+    <li>Người re-entry vào với 21–25bb và shove rộng. Vs shove của họ từ vị trí muộn: call 88+, ATs+, AJo+, KQs.</li>
+    <li>Nhiều người bust ngay sau khi đóng reg vì đang ngắn, field giảm nhanh. Xem số người còn lại và tổng prize pool khi được công bố.</li>
+    <li>Sau 22:50 level còn 25 phút. Với stack 30k bạn đã ở 20bb, chuẩn bị push/fold.</li>
+  </ul>
+  <h3>Quyết định re-entry</h3>
+  <ul>
+    <li>Bust ở L1–7: re-entry nếu còn trong ngân sách. 50bb+ vs field mềm là +EV rõ.</li>
+    <li>Bust ở L9–11: re-entry chỉ cho 21–30bb, gần như push/fold. Vẫn có EV nhưng mỏng.</li>
+    <li>Quyết định số bullet tối đa từ trước, đừng quyết khi đang tilt.</li>
+  </ul>
+</section>
+
+<!-- 14 -->
+<section id="bubble" data-title="Bubble" data-group="Giai đoạn giải">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Giai đoạn giải</div><h2>Khi bubble</h2></div></div>
+  <p>Bubble là khi còn vài người nữa là vào tiền. Bust lúc này mất hết, còn sống thêm vài tay có thể đã có tiền. Vì vậy hầu hết người chơi fold nhiều hơn bình thường, và đó là cơ hội.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Stack của bạn</th><th>Cách chơi</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Big stack</strong> (cover cả bàn)</td><td>Tấn công. Open và 3bet rộng, nhất là vs stack trung bình. Đừng tấn công stack lớn thứ hai bằng bài rác.</td></tr>
+      <tr><td><strong>Stack trung bình</strong> (20–40bb)</td><td>Bị ép nhiều nhất. Chặt lại khi call all-in, đặc biệt vs người cover bạn. Vẫn steal vs stack ngắn hơn bạn và vs người chặt.</td></tr>
+      <tr><td><strong>Short</strong> (10–20bb)</td><td>Shove vào stack trung bình: họ không muốn call. Tránh shove vào big stack vì họ call rộng.</td></tr>
+      <tr><td><strong>Rất short</strong> (&lt; 8bb)</td><td>Nếu còn người ngắn hơn ở bàn khác, có thể fold vài vòng. Nếu bạn ngắn nhất, shove khi có cơ hội tốt, đừng để blind ăn hết.</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Ví dụ chặt range call</h3>
+  <p>Bạn ở BB với 25bb, BTN shove 12bb. Chip-EV bạn call rất rộng (22+, A2s+, A7o+, K9s+, KJo+, QJs). Trên bubble với stack trung bình, chặt lại còn khoảng 66+, A9s+, ATo+, KQs. Là big stack thì call gần như range chip-EV.</p>
+  <div class="note gold"><b class="k">Hand-for-hand</b>Khi mọi bàn chia bài cùng lúc, mỗi tay mất blind chậm hơn. Stack rất ngắn có thể chờ lâu hơn. Big stack steal mỗi tay có thể.</div>
+</section>
+
+<!-- 15 -->
+<section id="icm" data-title="ICM" data-group="Giai đoạn giải">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Giai đoạn giải</div><h2>ICM</h2></div></div>
+  <p>ICM (Independent Chip Model) quy đổi chip thành giá trị tiền dựa trên bảng trả thưởng. Điều quan trọng nhất: <strong>chip bạn mất có giá trị lớn hơn chip bạn thắng.</strong> Gấp đôi stack không làm gấp đôi tiền dự kiến, nhưng bust thì mất hết.</p>
+  <h3>Ví dụ 3 người</h3>
+  <p>Stack 5.000 / 3.000 / 2.000 (50% / 30% / 20% chip). Trả thưởng 50 / 30 / 20.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Người</th><th class="n">% chip</th><th class="n">% tiền ICM</th></tr></thead>
+    <tbody>
+      <tr><td>Big</td><td class="n">50%</td><td class="n">38,4%</td></tr>
+      <tr><td>Mid</td><td class="n">30%</td><td class="n">32,8%</td></tr>
+      <tr><td>Short</td><td class="n">20%</td><td class="n">28,9%</td></tr>
+    </tbody>
+  </table></div>
+  <p>Big stack có gấp 2,5 lần chip của short, nhưng tiền dự kiến chỉ hơn khoảng 1,3 lần. Short chỉ cần sống là đã có 20.</p>
+
+  <h3>Hệ quả khi chơi</h3>
+  <ul>
+    <li><strong>Call all-in cần nhiều equity hơn chip-EV.</strong> Spot cần 50% theo chip có thể cần 55–65% theo ICM.</li>
+    <li><strong>Shove được rộng hơn call.</strong> Người shove có fold equity; người call phải chịu rủi ro.</li>
+    <li><strong>Người cover bạn nguy hiểm nhất.</strong> Họ có thể loại bạn. Người bạn cover thì bạn tấn công được.</li>
+    <li><strong>Stack trung bình chịu áp lực ICM lớn nhất,</strong> nhất là khi có stack ngắn sắp bust.</li>
+    <li>ICM chỉ áp dụng khi gần tiền và trong tiền. Ở L1–11 trước bubble, gần như dùng chip-EV.</li>
+  </ul>
+
+  <div class="tool" id="icmTool">
+    <div class="tool-h"><b>Máy tính ICM</b><span>Tối đa 9 người · dùng khi bàn đề nghị chia tiền</span></div>
+    <div class="fields">
+      <label for="iStacks">Stack từng người (cách nhau dấu phẩy)<textarea id="iStacks" rows="2">5000, 3000, 2000</textarea></label>
+      <label for="iPays">Giải thưởng từ hạng 1 trở xuống<textarea id="iPays" rows="2">50, 30, 20</textarea></label>
+    </div>
+    <div class="tw"><table>
+      <thead><tr><th>#</th><th class="n">Stack</th><th class="n">% chip</th><th class="n">Tiền ICM</th><th class="n">% tiền</th></tr></thead>
+      <tbody id="iBody"></tbody>
+    </table></div>
+    <p id="iMsg" style="color:var(--muted);font-size:13px;margin:0"></p>
+  </div>
+</section>
+
+<!-- 16 -->
+<section id="hai-ban" data-title="2 bàn" data-group="Giai đoạn giải">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Giai đoạn giải</div><h2>Hai bàn cuối</h2></div></div>
+  <p>Còn khoảng 10–18 người. Mỗi người bust là một bậc tiền, và bậc ngày càng lớn.</p>
+  <ul>
+    <li><strong>Bàn ít người hơn:</strong> khi bàn còn 6–7 người trước khi được ghép, mỗi vị trí đi blind nhanh hơn. Mở rộng range open và defend so với bàn đủ 9.</li>
+    <li><strong>Nhìn bàn bên kia:</strong> stack ngắn ở bàn khác ảnh hưởng ICM của bạn. Có người sắp bust thì stack trung bình fold nhiều hơn.</li>
+    <li><strong>Bubble bàn cuối:</strong> người thứ 10 thường là một bubble nhỏ, vì vào bàn cuối có bậc tiền lớn và thường có trình chiếu. Big stack đè mạnh như bubble thật.</li>
+    <li><strong>Chuẩn bị ghép bàn:</strong> ghi nhớ đối thủ chặt, đối thủ rộng, ai hay reshove. Đó là thông tin quý ở bàn cuối.</li>
+    <li><strong>Stack ngắn:</strong> nếu bậc tiền kế tiếp lớn và có người ngắn hơn, fold bài biên. Nếu bạn ngắn nhất, chọn spot shove vào người không muốn call.</li>
+  </ul>
+</section>
+
+<!-- 17 -->
+<section id="ban-cuoi" data-title="Bàn cuối" data-group="Giai đoạn giải">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Giai đoạn giải</div><h2>Bàn cuối (final table)</h2></div></div>
+  <p>Đây là nơi phần lớn tiền giải nằm. Mỗi quyết định all-in tính bằng tiền, không còn tính bằng chip.</p>
+  <h3>Theo số người</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Còn</th><th>Cách chơi</th></tr></thead>
+    <tbody>
+      <tr><td class="n">9–7</td><td>ICM mạnh nhất. Stack trung bình chơi chặt, big stack đè. Theo dõi ai ngắn nhất.</td></tr>
+      <tr><td class="n">6–4</td><td>Range mở rộng vì ít người. BTN open khoảng 50%, SB vs BB rộng. Vẫn tránh đụng người cover bạn với bài biên.</td></tr>
+      <tr><td class="n">3</td><td>BTN open khoảng 60–70%. Ba người thường đều ngắn so với blind, nhiều push/fold.</td></tr>
+      <tr><td class="n">2 (heads-up)</td><td>ICM gần như hết, chỉ còn chip-EV. SB/BTN open hoặc limp rất rộng (80%+). Dưới 12bb: shove hầu hết bài, call shove với mọi Ax, mọi đôi, phần lớn Kx.</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Nguyên tắc</h3>
+  <ul>
+    <li>Ai cover ai là câu hỏi đầu tiên trước mọi all-in.</li>
+    <li>Short stack tự bust nhau thì mọi người khác được thêm tiền. Đừng tốn chip để giúp họ, trừ khi bạn là big stack.</li>
+    <li>Chia tiền (deal): dùng máy tính ICM ở trên để so số tiền đề nghị với giá trị ICM của bạn. Bạn đánh giỏi hơn bàn thì có lý do đòi hơn ICM.</li>
+    <li>Nghỉ giữa các tay, đi lại, uống nước. Bàn cuối thường kéo dài; tỉnh táo là lợi thế.</li>
+  </ul>
+</section>
+
+<!-- 18 -->
+<section id="tra-nhanh" data-title="Tra nhanh" data-group="Công cụ">
+  <div class="sec-head"><div class="t"><div class="eyebrow">Công cụ</div><h2>Tra nhanh range</h2></div></div>
+  <p>Chọn bảng để xem range trên lưới 13×13. Góc trên phải là bài suited, góc dưới trái là offsuit, đường chéo là đôi.</p>
+  <div class="tool" id="rangeTool">
+    <div class="tool-h"><b>Bảng range</b><span id="rPct">–</span></div>
+    <div id="rChips"></div>
+    <div class="grid-wrap"><div class="grid" id="grid" aria-label="Lưới range"></div></div>
+    <div class="legend"><span><i style="background:var(--felt)"></i>Trong range</span><span><i style="background:var(--gold-soft)"></i>Đôi</span><span><i style="background:var(--surface-2)"></i>Ngoài range</span></div>
+    <div class="range-txt" id="rTxt"></div>
+    <p id="rNote" style="font-size:13px;color:var(--muted);margin-bottom:0"></p>
+  </div>
+
+  <div class="tool" id="quiz">
+    <div class="tool-h"><b>Luyện push/fold</b><span id="qScore">0/0</span></div>
+    <div class="quiz-q">
+      <div class="cards" id="qCards"></div>
+      <div class="quiz-meta"><b id="qPos">BTN</b><span style="color:var(--muted);font-size:13.5px">12bb, mọi người fold tới bạn. Shove hay fold?</span></div>
+    </div>
+    <div class="btns">
+      <button class="btn pri" id="qShove" type="button">Shove</button>
+      <button class="btn" id="qFold" type="button">Fold</button>
+      <button class="btn" id="qNext" type="button">Tay tiếp</button>
+    </div>
+    <div class="fb" id="qFb" aria-live="polite"></div>
+  </div>
+</section>
+
+<p class="foot">Range là xấp xỉ theo chip-EV cho bàn 8–9 người có BB ante. Chặt lại khi gần bubble và trong tiền, trừ khi bạn là big stack. Chúc bạn may mắn!</p>
+</main>
+
+<button class="totop" id="toTop" type="button" aria-label="Lên đầu trang">↑</button>
+
+<script>
+(function(){
+  var store = {
+    get:function(k,d){try{var v=localStorage.getItem(k);return v===null?d:JSON.parse(v);}catch(e){return d;}},
+    set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  };
+
+  /* ---------- Nav, TOC, progress ---------- */
+  var secs=[].slice.call(document.querySelectorAll('main section'));
+  var nav=document.getElementById('nav'), toc=document.getElementById('toc');
+  var learned=store.get('mtt-learned',{});
+  var lastGroup='';
+  secs.forEach(function(s){
+    var a=document.createElement('a'); a.href='#'+s.id; a.textContent=s.dataset.title; a.dataset.id=s.id; nav.appendChild(a);
+    if(s.dataset.group!==lastGroup){lastGroup=s.dataset.group;var g=document.createElement('div');g.className='toc-group';g.textContent=lastGroup;toc.appendChild(g);}
+    var t=document.createElement('a'); t.href='#'+s.id;
+    var sp=document.createElement('span'); sp.textContent=s.querySelector('.eyebrow').textContent;
+    t.appendChild(sp); t.appendChild(document.createTextNode(s.querySelector('h2').textContent)); toc.appendChild(t);
+    var b=document.createElement('button'); b.type='button'; b.className='learn'; b.id='learn-'+s.id;
+    s.querySelector('.sec-head').appendChild(b);
+    b.addEventListener('click',function(){learned[s.id]=!learned[s.id];store.set('mtt-learned',learned);paint();});
+  });
+  function paint(){
+    var n=0;
+    secs.forEach(function(s){
+      var on=!!learned[s.id]; if(on)n++;
+      var b=document.getElementById('learn-'+s.id); b.setAttribute('aria-pressed',on); b.textContent=on?'✓ Đã học':'Đánh dấu đã học';
+      nav.querySelector('[data-id="'+s.id+'"]').classList.toggle('done',on);
+    });
+    document.getElementById('progTxt').textContent=n+'/'+secs.length+' đã học';
+    document.getElementById('progBar').style.width=(n/secs.length*100)+'%';
+  }
+  paint();
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){
+      nav.querySelectorAll('a').forEach(function(a){a.classList.toggle('on',a.dataset.id===e.target.id);});
+      var cur=nav.querySelector('a.on'); if(cur){nav.scrollTo({left:cur.offsetLeft-nav.clientWidth/2+cur.clientWidth/2,behavior:'smooth'});}
+    }});},{rootMargin:'-40% 0px -55% 0px'});
+    secs.forEach(function(s){io.observe(s);});
+  }
+  document.getElementById('toTop').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+
+  /* ---------- Blind structure ---------- */
+  var LV=[
+    [1,100,100,100,'300'],[2,100,200,200,'500'],[3,100,300,300,'700–750'],[4,200,300,300,'700–750'],'B',
+    [5,200,400,400,'1.000'],[6,300,500,500,'1.200'],[7,300,600,600,'1.300–1.400'],'B',
+    [8,400,800,800,'1.700'],[9,500,1000,1000,'2.100'],[10,600,1200,1200,'2.400'],[11,700,1400,1400,'2.800'],'R',
+    [12,1000,1500,1500,'3.000 hoặc shove'],[13,1000,2000,2000,'shove / min-raise'],[14,1000,2500,2500,'shove'],[15,1500,3000,3000,'shove']
+  ];
+  function k(n){return n>=1000?(n/1000).toString().replace('.',',')+'K':String(n);}
+  function fmt(n){return Math.round(n).toLocaleString('vi-VN');}
+  function zone(l){return l<=4?'deep':l<=7?'steal':l<=11?'rs':'pf';}
+  var body=document.getElementById('blindBody'), sel=document.getElementById('cLevel'), levels=[];
+  LV.forEach(function(r){
+    var tr=document.createElement('tr');
+    if(r==='B'){tr.className='brk';tr.innerHTML='<td colspan="5">Break</td>';}
+    else if(r==='R'){tr.className='reg';tr.innerHTML='<td colspan="5">Đóng reg · 22:35</td>';}
+    else{
+      var pot=r[1]+r[2]+r[3]; levels.push({l:r[0],sb:r[1],bb:r[2],ante:r[3],open:r[4],pot:pot});
+      tr.innerHTML='<td><span class="lv '+zone(r[0])+'">L'+r[0]+'</span></td><td class="n">'+k(r[1])+'/'+k(r[2])+'/'+k(r[3])+'</td><td class="n">'+fmt(pot)+'</td><td class="n">'+fmt(30000/r[2])+'bb</td><td>'+r[4]+'</td>';
+      var o=document.createElement('option'); o.value=r[0]; o.textContent='L'+r[0]+' · '+k(r[1])+'/'+k(r[2]); sel.appendChild(o);
+    }
+    body.appendChild(tr);
+  });
+
+  /* ---------- Stack calculator ---------- */
+  var cS=document.getElementById('cStack'), cA=document.getElementById('cAvg');
+  var saved=store.get('mtt-calc',null);
+  if(saved){cS.value=saved.s;sel.value=saved.l;cA.value=saved.a||'';}
+  function adv(bb){
+    if(bb>=60)return['deep','Stack sâu · chơi postflop',['Set-mine đôi nhỏ, suited connectors có vị trí.','Iso rec limp, value bet 3 street vs station.','Không stack off one pair.']];
+    if(bb>=40)return['steal','Steal &amp; 3bet · tích chip',['Steal CO ~30%, BTN 45–50%, SB vs BB 50%+.','3bet vs CO/BTN: value JJ+, AQs+, AK; bluff A5s–A2s.','Bỏ đôi nhỏ vs 3bet khi xuống 50bb.']];
+    if(bb>=20)return['rs','Reshove · open 2–2,1x',['Vs open muộn: 3bet shove thay vì 3bet nhỏ.','3bet ≥ ⅓ stack bạn: shove hoặc fold.','Call shove re-entry muộn: 88+, ATs+, AJo+, KQs.']];
+    if(bb>=12)return['pf','Open-shove · reshove',['Shove từ vị trí muộn theo bảng Tra nhanh.','Min-raise AA–JJ, AK để dụ shove.','Hành động trước khi tới BB.']];
+    if(bb>=6)return['pf','Push/fold thuần',['Chỉ shove hoặc fold.','Shove rộng hơn ở BTN/SB.','Không open-fold, không limp-fold.']];
+    return['pf','Rất ngắn · shove rộng',['Fold equity đang mất nhanh: shove ngay khi có bài tạm.','BTN/SB vs BB chặt: gần như mọi hai lá.','Gần bubble: cân nhắc có ai ngắn hơn không.']];
+  }
+  function calc(){
+    var s=+cS.value||0, L=levels.filter(function(x){return x.l==sel.value;})[0], a=+cA.value||0;
+    var bb=s/L.bb;
+    document.getElementById('oBB').textContent=(bb>=100?Math.round(bb):bb.toFixed(1).replace('.',','))+'bb';
+    document.getElementById('oM').textContent=(s/L.pot).toFixed(1).replace('.',',');
+    var open;
+    if(bb<15)open='Shove'; else if(bb<=40)open=fmt(Math.round(L.bb*2.1/100)*100); else if(bb<=75&&L.l>4)open=fmt(Math.round(L.bb*2.3/100)*100); else open=L.open;
+    document.getElementById('oOpen').textContent=open;
+    var oa=document.getElementById('oAvg');
+    if(a>0){var r=s/a;oa.textContent=r.toFixed(2).replace('.',',')+'×';}else oa.textContent='–';
+    var ad=adv(bb), box=document.getElementById('oAdv');
+    box.className='advice '+ad[0];
+    var extra='';
+    if(a>0){var r2=s/a; if(r2<0.7)extra='<li><strong>Dưới 0,7× average:</strong> chủ động steal và reshove nhiều hơn.</li>'; else if(r2>1.5)extra='<li><strong>Trên 1,5× average:</strong> đè các stack trung bình.</li>';}
+    var sbNote={1:'SB = BB ở L1: không bao giờ fold SB khi chưa ai raise.',3:'SB rẻ ở L3: steal CO/BTN rộng; ở SB vs open thì 3bet hoặc fold.',4:'SB = ⅔ BB ở L4: complete/limp rất rộng khi fold về SB.',12:'SB = ⅔ BB ở L12: ở SB shove rộng hơn nữa hoặc limp bài mạnh để bẫy.',14:'SB rẻ ở L14: BTN/CO steal mạnh hơn.'}[L.l];
+    if(sbNote)extra+='<li><strong>Lưu ý SB:</strong> '+sbNote+'</li>';
+    box.innerHTML='<b>'+ad[1]+'</b><ul>'+ad[2].map(function(x){return'<li>'+x+'</li>';}).join('')+extra+'</ul>';
+    store.set('mtt-calc',{s:cS.value,l:sel.value,a:cA.value});
+  }
+  [cS,sel,cA].forEach(function(el){el.addEventListener('input',calc);el.addEventListener('change',calc);});
+  calc();
+
+  /* ---------- Range parsing ---------- */
+  var R='AKQJT98765432';
+  function ix(c){return R.indexOf(c);}
+  function parse(str){
+    var set={};
+    str.split(',').forEach(function(t){
+      t=t.trim(); if(!t)return; var m;
+      if((m=t.match(/^([AKQJT2-9])\1\+$/))){for(var i=ix(m[1]);i>=0;i--)set[R[i]+R[i]]=1;}
+      else if((m=t.match(/^([AKQJT2-9])\1-([AKQJT2-9])\2$/))){var a=ix(m[1]),b=ix(m[2]);for(var i2=Math.min(a,b);i2<=Math.max(a,b);i2++)set[R[i2]+R[i2]]=1;}
+      else if((m=t.match(/^([AKQJT2-9])\1$/))){set[t]=1;}
+      else if((m=t.match(/^([AKQJT2-9])([AKQJT2-9])([so])\+$/))){var h=ix(m[1]);for(var j=ix(m[2]);j>h;j--)set[R[h]+R[j]+m[3]]=1;}
+      else if((m=t.match(/^([AKQJT2-9])([AKQJT2-9])([so])-([AKQJT2-9])([AKQJT2-9])([so])$/))){var h2=ix(m[1]),x=ix(m[2]),y=ix(m[5]);for(var j2=Math.min(x,y);j2<=Math.max(x,y);j2++)set[R[h2]+R[j2]+m[3]]=1;}
+      else if((m=t.match(/^([AKQJT2-9])([AKQJT2-9])([so])$/))){set[t]=1;}
+      else if((m=t.match(/^([AKQJT2-9])([AKQJT2-9])\+$/))){var h3=ix(m[1]);for(var j3=ix(m[2]);j3>h3;j3--){set[R[h3]+R[j3]+'s']=1;set[R[h3]+R[j3]+'o']=1;}}
+      else if((m=t.match(/^([AKQJT2-9])([AKQJT2-9])$/))){set[t+'s']=1;set[t+'o']=1;}
+    });
+    return set;
+  }
+  function combos(h){return h.length===2?6:h[2]==='s'?4:12;}
+  function pct(set){var c=0;for(var h in set)c+=combos(h);return c/1326*100;}
+
+  var CH=[
+    {g:'Open-shove 10–15bb',items:[
+      ['UTG / UTG+1','66+, A9s+, ATo+, KQs'],
+      ['MP','44+, A7s+, A9o+, KTs+, KQo, QJs'],
+      ['HJ / CO','22+, A2s+, A7o+, K9s+, KJo+, QTs+, JTs, T9s'],
+      ['BTN','22+, A2s+, A2o+, K5s+, K9o+, Q8s+, QTo+, J8s+, JTo, T8s+, 97s+, 87s, 76s'],
+      ['SB vs BB','22+, A2s+, A2o+, K2s+, K5o+, Q5s+, Q8o+, J7s+, J9o+, T7s+, 97s+, 86s+, 76s, 65s']],
+      note:'Có BB ante. Ở L12 khi ở SB thì shove rộng hơn nữa.'},
+    {g:'BB call shove 12bb',items:[
+      ['vs UTG / MP','88+, AJs+, AQo+'],
+      ['vs CO','55+, A8s+, ATo+, KQs'],
+      ['vs BTN','22+, A2s+, A7o+, K9s+, KJo+, QJs'],
+      ['vs SB','22+, A2s+, A2o+, K7s+, KTo+, Q9s+, QJo, JTs']],
+      note:'Gần bubble hoặc gần tiền: chặt lại khoảng 20–30%, trừ khi bạn là big stack.'},
+    {g:'3bet shove 20–30bb',items:[
+      ['vs UTG / UTG+1','TT+, AQs+, AQo+'],
+      ['vs MP','88+, AJs+, AQo+, KQs'],
+      ['vs CO','66+, A9s+, ATo+, KJs+, KQo'],
+      ['vs BTN / SB','22+, A2s+, A8o+, K9s+, KJo+, QTs+, JTs']],
+      note:'Dùng từ L9 (30bb trở xuống). Không 3bet nhỏ rồi fold.'},
+    {g:'Open raise 40bb+',items:[
+      ['UTG','66+, A9s+, A5s-A4s, KTs+, QTs+, JTs, T9s, AJo+, KQo'],
+      ['UTG+1 / MP','55+, A7s+, A5s-A3s, K9s+, Q9s+, J9s+, T9s, 98s, ATo+, KJo+'],
+      ['HJ','33+, A2s+, K8s+, Q9s+, J9s+, T8s+, 97s+, 87s, 76s, ATo+, KJo+, QJo'],
+      ['CO','22+, A2s+, K6s+, Q8s+, J8s+, T8s+, 97s+, 86s+, 76s, 65s, A8o+, KTo+, QTo+, JTo'],
+      ['BTN','22+, A2s+, K2s+, Q4s+, J6s+, T6s+, 96s+, 85s+, 75s+, 64s+, 54s, A2o+, K8o+, Q9o+, J9o+, T9o, 98o'],
+      ['SB vs BB','22+, A2s+, K2s+, Q5s+, J7s+, T7s+, 96s+, 86s+, 75s+, 65s, 54s, A2o+, K8o+, Q9o+, J9o+, T9o']],
+      note:'Bàn 8–9 người, chip-EV. Người phía sau hay 3bet thì bỏ đáy range.'}
+  ];
+  var grid=document.getElementById('grid'), cells={};
+  for(var r=0;r<13;r++)for(var c=0;c<13;c++){
+    var h=r===c?R[r]+R[r]:r<c?R[r]+R[c]+'s':R[c]+R[r]+'o';
+    var d=document.createElement('div'); d.className='cell'+(r===c?' pair':''); d.textContent=h; grid.appendChild(d); cells[h]=d;
+  }
+  var rc=document.getElementById('rChips'), btns=[];
+  var cur=store.get('mtt-chart','0-3');
+  CH.forEach(function(grp,gi){
+    var lab=document.createElement('div'); lab.className='grp-label'; lab.textContent=grp.g; rc.appendChild(lab);
+    var row=document.createElement('div'); row.className='chips'; rc.appendChild(row);
+    grp.items.forEach(function(it,ii){
+      var b=document.createElement('button'); b.type='button'; b.className='chip'; b.textContent=it[0]; b.dataset.key=gi+'-'+ii;
+      b.addEventListener('click',function(){show(b.dataset.key);}); row.appendChild(b); btns.push(b);
+    });
+  });
+  function show(key){
+    var p=key.split('-'), grp=CH[+p[0]], it=grp&&grp.items[+p[1]]; if(!it){key='0-3';p=['0','3'];grp=CH[0];it=grp.items[3];}
+    var set=parse(it[1]);
+    for(var h in cells)cells[h].classList.toggle('in',!!set[h]);
+    btns.forEach(function(b){b.setAttribute('aria-pressed',b.dataset.key===key);});
+    document.getElementById('rPct').textContent=grp.g+' · '+it[0]+' · '+pct(set).toFixed(1).replace('.',',')+'% bài';
+    document.getElementById('rTxt').textContent=it[1];
+    document.getElementById('rNote').textContent=grp.note;
+    store.set('mtt-chart',key);
+  }
+  show(cur);
+
+  /* ---------- Push/fold quiz ---------- */
+  var SH=CH[0].items.map(function(it){return{pos:it[0],set:parse(it[1])};});
+  var SUITS=[['♠',''],['♥','r'],['♦','b'],['♣','g']];
+  var q=null, score=store.get('mtt-quiz',{ok:0,n:0}), answered=false;
+  function deal(){
+    var a=Math.floor(Math.random()*52), b; do{b=Math.floor(Math.random()*52);}while(b===a);
+    var ra=Math.floor(a/4), rb=Math.floor(b/4), sa=a%4, sb=b%4;
+    var hi=Math.min(ra,rb), lo=Math.max(ra,rb);
+    var hand=hi===lo?R[hi]+R[hi]:R[hi]+R[lo]+(sa===sb?'s':'o');
+    var p=SH[Math.floor(Math.random()*SH.length)];
+    q={hand:hand,pos:p,cards:[[R[ra],sa],[R[rb],sb]]}; answered=false;
+    var cc=document.getElementById('qCards'); cc.innerHTML='';
+    q.cards.forEach(function(cd){var e=document.createElement('div');e.className='card '+SUITS[cd[1]][1];e.innerHTML=(cd[0]==='T'?'10':cd[0])+'<span>'+SUITS[cd[1]][0]+'</span>';cc.appendChild(e);});
+    document.getElementById('qPos').textContent=p.pos+' · '+hand;
+    var fb=document.getElementById('qFb'); fb.textContent=''; fb.className='fb';
+  }
+  function answer(shove){
+    if(answered)return; answered=true;
+    var right=!!q.pos.set[q.hand], ok=shove===right;
+    score.n++; if(ok)score.ok++; store.set('mtt-quiz',score);
+    var fb=document.getElementById('qFb');
+    fb.className='fb '+(ok?'ok':'no');
+    fb.textContent=(ok?'Đúng. ':'Sai. ')+q.hand+' ở '+q.pos.pos+' là '+(right?'SHOVE':'FOLD')+' (range '+pct(q.pos.set).toFixed(0)+'% bài).';
+    document.getElementById('qScore').textContent=score.ok+'/'+score.n+' đúng';
+  }
+  document.getElementById('qShove').addEventListener('click',function(){answer(true);});
+  document.getElementById('qFold').addEventListener('click',function(){answer(false);});
+  document.getElementById('qNext').addEventListener('click',deal);
+  document.getElementById('qScore').textContent=score.ok+'/'+score.n+' đúng';
+  deal();
+
+  /* ---------- ICM ---------- */
+  var iS=document.getElementById('iStacks'), iP=document.getElementById('iPays');
+  function nums(s){return s.split(/[\s,;]+/).map(function(x){return parseFloat(x.replace(/\./g,''));}).filter(function(x){return x>0;});}
+  function icm(st,pay){
+    var n=st.length, ev=st.map(function(){return 0;}), tot=st.reduce(function(a,b){return a+b;},0);
+    (function rec(mask,total,place,prob){
+      if(place>=pay.length)return;
+      for(var i=0;i<n;i++)if(mask&(1<<i)){var p=prob*st[i]/total;ev[i]+=p*pay[place];if(mask&~(1<<i))rec(mask&~(1<<i),total-st[i],place+1,p);}
+    })((1<<n)-1,tot,0,1);
+    return ev;
+  }
+  function runIcm(){
+    var st=nums(iS.value), pay=nums(iP.value).slice(0,st.length), msg=document.getElementById('iMsg'), tb=document.getElementById('iBody');
+    tb.innerHTML='';
+    if(st.length<2){msg.textContent='Nhập ít nhất 2 stack.';return;}
+    if(st.length>9){msg.textContent='Tối đa 9 người.';return;}
+    if(!pay.length){msg.textContent='Nhập ít nhất 1 giải thưởng.';return;}
+    var ev=icm(st,pay), tot=st.reduce(function(a,b){return a+b;},0), ptot=pay.reduce(function(a,b){return a+b;},0);
+    st.forEach(function(s,i){
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td class="n">'+(i+1)+'</td><td class="n">'+fmt(s)+'</td><td class="n">'+(s/tot*100).toFixed(1).replace('.',',')+'%</td><td class="n">'+ev[i].toFixed(2).replace('.',',')+'</td><td class="n">'+(ev[i]/ptot*100).toFixed(1).replace('.',',')+'%</td>';
+      tb.appendChild(tr);
+    });
+    msg.textContent='Tổng giải thưởng: '+fmt(ptot)+'. Đơn vị tiền theo đơn vị bạn nhập.';
+  }
+  iS.addEventListener('input',runIcm); iP.addEventListener('input',runIcm); runIcm();
+})();
+</script>
+</body></html>
